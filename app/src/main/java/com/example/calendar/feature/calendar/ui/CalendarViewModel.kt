@@ -3,14 +3,16 @@ package com.example.calendar.feature.calendar.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.calendar.feature.calendar.domain.usecase.GetMonthDaysUseCase
-import com.example.calendar.feature.calendar.domain.usecase.LoadQuoteUseCase
+import com.example.calendar.service.hitokoto.domain.usecase.LoadQuoteUseCase
 import com.example.calendar.feature.settings.domain.repository.SettingsRepository
-import com.example.calendar.feature.weather.domain.repository.WeatherRepository
-import com.example.calendar.feature.weather.domain.usecase.RefreshWeatherUseCase
+import com.example.calendar.service.wallpaper.domain.usecase.WallpaperUseCase
+import com.example.calendar.service.weather.domain.repository.WeatherRepository
+import com.example.calendar.service.weather.domain.usecase.RefreshWeatherUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -25,8 +27,15 @@ class CalendarViewModel(
     private val settingsRepository: SettingsRepository,
     private val getMonthDays: GetMonthDaysUseCase,
     private val refreshWeather: RefreshWeatherUseCase,
-    private val loadQuoteUseCase: LoadQuoteUseCase
+    private val loadQuoteUseCase: LoadQuoteUseCase,
+    private val wallpaperUseCase: WallpaperUseCase
 ) : ViewModel() {
+
+    private val _wallpaperPath = MutableStateFlow<String?>(null)
+    val wallpaperPath: StateFlow<String?> = _wallpaperPath.asStateFlow()
+
+    private val _currentCategory = MutableStateFlow("pc")
+    val currentCategory: StateFlow<String> = _currentCategory.asStateFlow()
     private val _currentMonth = MutableStateFlow(LocalDate.now().withDayOfMonth(1))
     private val _selectedDate = MutableStateFlow(LocalDate.now())
 
@@ -65,7 +74,9 @@ class CalendarViewModel(
 
     init {
         Timber.d("CalendarViewModel: created")
-        viewModelScope.launch { refreshWeather() }
+        viewModelScope.launch {
+            refreshWeather()
+        }
         startPeriodicRefresh()
         loadQuote()
     }
@@ -114,5 +125,29 @@ class CalendarViewModel(
 
     fun onMonthChanged(newMonth: LocalDate) {
         _currentMonth.update { newMonth }
+    }
+
+    fun refreshBackground(deviceWidthDp: Int) {
+        viewModelScope.launch {
+            wallpaperUseCase.getImageForToday(deviceWidthDp)?.let { info ->
+                _wallpaperPath.update { info.path }
+                _currentCategory.update { info.category }
+            }
+        }
+    }
+
+    fun onLike(category: String) {
+        viewModelScope.launch {
+            wallpaperUseCase.recordLike(category)
+        }
+    }
+
+    fun onDislike(category: String) {
+        viewModelScope.launch {
+            wallpaperUseCase.recordDislikeAndSwap(category)?.let { info ->
+                _wallpaperPath.update { info.path }
+                _currentCategory.update { info.category }
+            }
+        }
     }
 }

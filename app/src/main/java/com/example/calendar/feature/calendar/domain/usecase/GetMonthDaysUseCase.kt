@@ -1,7 +1,7 @@
 package com.example.calendar.feature.calendar.domain.usecase
 
 import com.example.calendar.feature.calendar.domain.model.CalendarDay
-import com.example.calendar.feature.weather.data.local.WeatherEntity
+import com.example.calendar.service.weather.data.local.WeatherEntity
 import java.time.LocalDate
 
 class GetMonthDaysUseCase {

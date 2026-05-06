@@ -20,7 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.calendar.feature.calendar.domain.model.CalendarDay
@@ -31,6 +34,11 @@ fun CalendarGrid(
     days: List<CalendarDay>, onDateClick: (LocalDate) -> Unit, modifier: Modifier = Modifier
 ) {
     val weekDays = listOf("日", "一", "二", "三", "四", "五", "六")
+    val readableShadow = Shadow(
+        color = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.55f),
+        offset = Offset(0f, 1.5f),
+        blurRadius = 4f
+    )
     Column(modifier = modifier.fillMaxWidth()) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(7), modifier = Modifier.fillMaxWidth()
@@ -42,8 +50,10 @@ fun CalendarGrid(
                 ) {
                     Text(
                         text = day,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.bodyMedium.copy(shadow = readableShadow),
+                        color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.88f),
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
                     )
                 }
             }
@@ -57,6 +67,11 @@ fun CalendarGrid(
 
 @Composable
 fun CalendarDayItem(day: CalendarDay, onClick: () -> Unit) {
+    val readableShadow = Shadow(
+        color = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.62f),
+        offset = Offset(0f, 1.5f),
+        blurRadius = 4f
+    )
     Box(
         modifier = Modifier
             .aspectRatio(1f)
@@ -64,11 +79,16 @@ fun CalendarDayItem(day: CalendarDay, onClick: () -> Unit) {
             .clip(RoundedCornerShape(8.dp))
             .then(
                 if (day.isSelected) {
-                    Modifier.border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(8.dp)
-                    )
+                    Modifier
+                        .background(
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.24f),
+                            RoundedCornerShape(12.dp)
+                        )
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f),
+                            shape = RoundedCornerShape(12.dp)
+                        )
                 } else Modifier
 
             )
@@ -76,9 +96,9 @@ fun CalendarDayItem(day: CalendarDay, onClick: () -> Unit) {
 
     ) {
         val textColor = when {
-            day.isToday -> MaterialTheme.colorScheme.onPrimary
-            !day.isCurrentMonth -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-            else -> MaterialTheme.colorScheme.onSurface
+            day.isToday -> androidx.compose.ui.graphics.Color.White
+            !day.isCurrentMonth -> androidx.compose.ui.graphics.Color.White.copy(alpha = 0.34f)
+            else -> androidx.compose.ui.graphics.Color.White.copy(alpha = 0.92f)
         }
 
         if (day.isToday) {
@@ -86,7 +106,7 @@ fun CalendarDayItem(day: CalendarDay, onClick: () -> Unit) {
                 modifier = Modifier
                     .size(32.dp)
                     .background(
-                        MaterialTheme.colorScheme.primary, CircleShape
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.72f), CircleShape
                     )
             )
         }
@@ -95,7 +115,8 @@ fun CalendarDayItem(day: CalendarDay, onClick: () -> Unit) {
             Text(
                 text = day.date.dayOfMonth.toString(),
                 color = textColor,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge.copy(shadow = readableShadow),
+                fontWeight = if (day.isToday || day.isSelected) FontWeight.SemiBold else FontWeight.Normal
             )
             if (day.hasEvents) {
                 Box(

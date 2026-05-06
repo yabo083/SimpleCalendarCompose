@@ -2,7 +2,18 @@
   "permissions": {
     "allow": [
       "Bash(./gradlew assembleDebug)",
-      "Bash(./gradlew installDebug)"
+      "Bash(./gradlew installDebug)",
+      "mcp__whimsical-desktop__inspect_state",
+      "mcp__whimsical-desktop__board_create",
+      "mcp__whimsical-desktop__flexbox_compose",
+      "mcp__whimsical-desktop__board_clear",
+      "mcp__whimsical-desktop__board_read",
+      "mcp__whimsical-desktop__delete",
+      "mcp__whimsical-desktop__board_edit",
+      "mcp__whimsical-desktop__flowchart_create",
+      "mcp__whimsical-desktop__board_snapshot",
+      "mcp__whimsical-desktop__content_read",
+      "mcp__whimsical-desktop__content_edit"
     ]
   }
 }

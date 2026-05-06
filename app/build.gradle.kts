@@ -5,11 +5,29 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+kotlin {
+    jvmToolchain(21)
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+        vendor.set(JvmVendorSpec.AZUL)
+    }
+}
+
 val weatherApiKey = rootProject.file("local.properties")
     .takeIf { it.exists() }
     ?.readLines()
     ?.find { it.startsWith("weather.api.key=") }
     ?.substringAfter("weather.api.key=")
+    ?: ""
+
+val uapiApiKey = rootProject.file("local.properties")
+    .takeIf { it.exists() }
+    ?.readLines()
+    ?.find { it.startsWith("uapi.api.key=") }
+    ?.substringAfter("uapi.api.key=")
     ?: ""
 
 android {
@@ -24,6 +42,7 @@ android {
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "WEATHER_API_KEY", "\"$weatherApiKey\"")
+        buildConfigField("String", "UAPI_API_KEY", "\"$uapiApiKey\"")
     }
 
     buildTypes {
@@ -57,6 +76,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.coil.compose)
 
     // Room
     implementation(libs.androidx.room.runtime)
